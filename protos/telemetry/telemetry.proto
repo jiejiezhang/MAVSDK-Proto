@@ -16,6 +16,8 @@ service TelemetryService {
     rpc SubscribePosition(SubscribePositionRequest) returns(stream PositionResponse) {}
     // Subscribe to 'home position' updates.
     rpc SubscribeHome(SubscribeHomeRequest) returns(stream HomeResponse) {}
+    // Subscribe to 'flow' updates.
+    rpc SubscribeFlow(SubscribeFlowRequest) returns(stream FlowResponse) {}
     // Subscribe to in-air updates.
     rpc SubscribeInAir(SubscribeInAirRequest) returns(stream InAirResponse) {}
     // Subscribe to landed state updates
@@ -71,6 +73,8 @@ service TelemetryService {
     rpc SetRatePosition(SetRatePositionRequest) returns(SetRatePositionResponse) {}
     // Set rate to 'home position' updates.
     rpc SetRateHome(SetRateHomeRequest) returns(SetRateHomeResponse) {}
+    // Set rate to 'flow' updates.
+    rpc SetRateFlow(SetRateFlowRequest) returns(SetRateFlowResponse) {}
     // Set rate to in-air updates.
     rpc SetRateInAir(SetRateInAirRequest) returns(SetRateInAirResponse) {}
     // Set rate to landed state updates
@@ -115,6 +119,11 @@ message PositionResponse {
 message SubscribeHomeRequest {}
 message HomeResponse {
     Position home = 1; // The next home position
+}
+
+message SubscribeFlowRequest {}
+message FlowResponse {
+    Flow flow = 1; // The flow message
 }
 
 message SubscribeInAirRequest {}
@@ -253,6 +262,13 @@ message SetRateHomeRequest {
     double rate_hz = 1; // The requested rate (in Hertz)
 }
 message SetRateHomeResponse {
+    TelemetryResult telemetry_result = 1;
+}
+
+message SetRateFlowRequest {
+    double rate_hz = 1; // The requested rate (in Hertz)
+}
+message SetRateFlowResponse {
     TelemetryResult telemetry_result = 1;
 }
 
@@ -395,6 +411,14 @@ message Position {
     double longitude_deg = 2 [(mavsdk.options.default_value)="NaN"]; // Longitude in degrees (range: -180 to +180)
     float absolute_altitude_m = 3 [(mavsdk.options.default_value)="NaN"]; // Altitude AMSL (above mean sea level) in metres
     float relative_altitude_m = 4 [(mavsdk.options.default_value)="NaN"]; // Altitude relative to takeoff altitude in metres
+}
+
+// The flow message shows that flow meter
+message Flow {
+    float flowrate_raw = 1 [(mavsdk.options.default_value)="NaN"]; // Original flow rate of flowmeter.uint: L/min
+    float flowrate_filter = 2 [(mavsdk.options.default_value)="NaN"]; // Filtered flow rate of flowmeter.uint: L/min
+    float dosage_raw = 3 [(mavsdk.options.default_value)="NaN"]; // Original dosage. uint: L
+    float dosage_filter = 4 [(mavsdk.options.default_value)="NaN"]; // Filtered dosage. uint: L
 }
 
 /*
